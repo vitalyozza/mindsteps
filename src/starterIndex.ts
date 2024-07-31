@@ -1,6 +1,7 @@
-import { App, ItemView, Platform, Plugin, PluginSettingTab, Setting, WorkspaceLeaf } from 'obsidian';
+import { App, ItemView, Platform, Plugin, PluginSettingTab, Setting, WorkspaceLeaf, Modal } from 'obsidian';
 
 import DiceRoller from "./ui/DiceRoller.svelte";
+import TrackerModal from "./ui/Modal.svelte";
 
 const VIEW_TYPE = "svelte-view";
 
@@ -14,6 +15,24 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
     mySetting: 'default'
 };
 
+export class ExampleModal extends Modal {
+    private component: TrackerModal | null = null;
+
+    constructor(app: App) {
+      super(app);
+    }
+  
+    onOpen() {
+        this.component = new TrackerModal({target: this.contentEl, props: {
+            app: this.app
+        }});
+    }
+  
+    onClose() {
+      const { contentEl } = this;
+      contentEl.empty();
+    }
+}
 
 class MySvelteView extends ItemView {
     private component: DiceRoller | null = null;
@@ -51,10 +70,26 @@ export default class MyPlugin extends Plugin {
             (leaf: WorkspaceLeaf) => (this.view = new MySvelteView(leaf))
         );
 
+        this.addCommand({
+            id: "mindsteps-track",
+            name: "Track...",
+            callback: () => {
+                console.log("Let's start to track...");
+            },
+        });
+
+        this.addCommand({
+            id: "display-modal",
+            name: "Display modal",
+            callback: () => {
+              new ExampleModal(this.app).open();
+            },
+        });
+
         this.app.workspace.onLayoutReady(this.onLayoutReady.bind(this));
 
         // This creates an icon in the left ribbon.
-        this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => this.openMapView());
+        this.addRibbonIcon('dice', 'mindsteps', (evt: MouseEvent) => this.openMapView());
 
         // This adds a simple command that can be triggered anywhere
         this.addCommand({
