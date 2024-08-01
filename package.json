@@ -1,7 +1,7 @@
 {
-    "name": "obsidian-svelte-starter",
-    "version": "1.0.3",
-    "description": "A plugin development template for devs who want to use svelte in Obsidian.",
+    "name": "mind-steps",
+    "version": "0.0.1",
+    "description": "Simple Tracker for Obsidian",
     "main": "main.js",
     "scripts": {
         "lint": "npx eslint --ext .ts,.svelte .",
@@ -10,7 +10,7 @@
         "bumpversion": "node version-bump.mjs && git add manifest.json versions.json"
     },
     "keywords": [],
-    "author": "Quorafind",
+    "author": "vitalyozza",
     "devDependencies": {
         "@sveltejs/vite-plugin-svelte": "^3.1.0",
         "@tsconfig/svelte": "^5.0.4",
@@ -27,6 +27,8 @@
         "svelte-check": "^3.6.9",
         "svelte-eslint-parser": "^0.34.1",
         "svelte-preprocess": "^5.1.4",
+        "svelte-range-slider-pips": "^2.3.1",
+        "svelte-switcher": "^1.0.2",
         "tslib": "2.4.0",
         "typescript": "5.3.3",
         "vite": "^5.2.10"

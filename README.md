@@ -1,17 +1,17 @@
-# obsidian-svelte-starter
+# Mind Steps
 
-A starter template for creating an Obsidian plugin with SvelteJS.
+Simple Tracker for Obsidian
 
-# Features
+## How to use this plugin
 
-This project comes preconfigured with [Typescript](https://www.typescriptlang.org/), [vite](https://vitejs.dev), and
-[Rollup.js](https://rollupjs.org).
+1. Install
+2. open the settings and enter a tag to track the event
+3. Add this special tag to some .md files
+4. Click on the plugin icon in the ribbon menu
+5. Add the information in the window that opens
+	- You will then see the updates in the daily note and in the tracked file
 
-# Getting Started
-
-Click "use this template" to create your own fork of this repo. Make sure to reference the official sample plugin for
-information about how to get started with the Obsidian API and how to submit your plugin to the Community Plugin
-Gallery.
+## Development
 
 ```bash
 # for local development
@@ -29,7 +29,7 @@ npm bumpversion
 // Or yarn bumpversion
 ```
 
-# Stats
+## Stats
 
 The production output of this sample plugin is ~10 KB.
 

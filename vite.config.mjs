@@ -64,7 +64,7 @@ export default defineConfig(() => {
             },
             // Use root as the output dir
             emptyOutDir: false,
-            outDir: '.',
+            outDir: 'dist',
         },
     }
 });

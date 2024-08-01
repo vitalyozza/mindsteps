@@ -1,115 +1,70 @@
-import { App, ItemView, Platform, Plugin, PluginSettingTab, Setting, WorkspaceLeaf, Modal } from 'obsidian';
-
-import DiceRoller from "./ui/DiceRoller.svelte";
+import { App, Plugin, PluginSettingTab, Setting, Modal, Notice } from 'obsidian';
+import { getFilesByTag } from "./common"
 import TrackerModal from "./ui/Modal.svelte";
 
-const VIEW_TYPE = "svelte-view";
-
-// Remember to rename these classes and interfaces!
-
-interface MyPluginSettings {
-    mySetting: string;
+interface MindStepsSettings {
+    tag: string;
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
-    mySetting: 'default'
+const DEFAULT_SETTINGS: MindStepsSettings = {
+    tag: '#track'
 };
 
-export class ExampleModal extends Modal {
+export class TrackModal extends Modal {
     private component: TrackerModal | null = null;
+    settings: MindStepsSettings;
 
-    constructor(app: App) {
-      super(app);
+    constructor(app: App, settings: MindStepsSettings) {
+        super(app);
+        this.settings = settings
     }
-  
+
     onOpen() {
-        this.component = new TrackerModal({target: this.contentEl, props: {
-            app: this.app
-        }});
+        this.component = new TrackerModal({
+            target: this.contentEl, props: {
+                app: this.app,
+                modal: this,
+                settings: this.settings
+            }
+        });
     }
-  
+
     onClose() {
-      const { contentEl } = this;
-      contentEl.empty();
+        try {
+            this.close()   
+        } catch (RangeError) {
+            return true
+        }
     }
 }
 
-class MySvelteView extends ItemView {
-    private component: DiceRoller | null = null;
-
-    constructor(leaf: WorkspaceLeaf) {
-        super(leaf);
-    }
-
-    getViewType(): string {
-        return VIEW_TYPE;
-    }
-
-    getDisplayText(): string {
-        return "Dice Roller";
-    }
-
-    getIcon(): string {
-        return "dice";
-    }
-
-    async onOpen(): Promise<void> {
-        this.component = new DiceRoller({target: this.contentEl, props: {}});
-    }
-}
-
-export default class MyPlugin extends Plugin {
-    private view: MySvelteView | null = null;
-    settings: MyPluginSettings = DEFAULT_SETTINGS;
+export default class MindSteps extends Plugin {
+    settings: MindStepsSettings = DEFAULT_SETTINGS;
+    statusBarItem: HTMLElement | undefined;
 
     async onload() {
         await this.loadSettings();
 
-        this.registerView(
-            VIEW_TYPE,
-            (leaf: WorkspaceLeaf) => (this.view = new MySvelteView(leaf))
-        );
-
-        this.addCommand({
-            id: "mindsteps-track",
-            name: "Track...",
-            callback: () => {
-                console.log("Let's start to track...");
-            },
-        });
-
         this.addCommand({
             id: "display-modal",
-            name: "Display modal",
+            name: "Track habit or chronology",
             callback: () => {
-              new ExampleModal(this.app).open();
+                new TrackModal(this.app, this.settings).open();
+                this.updateStatusBar();
             },
         });
 
-        this.app.workspace.onLayoutReady(this.onLayoutReady.bind(this));
+        this.statusBarItem = this.addStatusBarItem();
+        this.updateStatusBar();
 
         // This creates an icon in the left ribbon.
-        this.addRibbonIcon('dice', 'mindsteps', (evt: MouseEvent) => this.openMapView());
-
-        // This adds a simple command that can be triggered anywhere
-        this.addCommand({
-            id: 'open-sample-modal-simple',
-            name: 'Open sample modal (simple)',
-            callback: () => this.openMapView(),
+        this.addRibbonIcon('calendar-with-checkmark', 'mindsteps', (evt: MouseEvent) => {
+            new TrackModal(this.app, this.settings).open()
+            this.updateStatusBar();
         });
+
         // This adds a settings tab so the user can configure various aspects of the plugin
         this.addSettingTab(new SampleSettingTab(this.app, this));
-    }
-
-    onLayoutReady(): void {
-        if (this.app.workspace.getLeavesOfType(VIEW_TYPE).length) {
-            this.app.workspace.rightSplit.collapsed && this.app.workspace.rightSplit.toggle(true);
-            return;
-        }
-        this.app.workspace.getRightLeaf(false)?.setViewState({
-            type: VIEW_TYPE,
-        });
-        this.app.workspace.rightSplit.collapsed && this.app.workspace.rightSplit.toggle(true);
     }
 
     onunload() {
@@ -122,43 +77,39 @@ export default class MyPlugin extends Plugin {
 
     async saveSettings() {
         await this.saveData(this.settings);
+        new Notice("Mind Steps: Settings updated!")
+        this.updateStatusBar();
     }
 
-    async openMapView() {
-        const workspace = this.app.workspace;
-        workspace.detachLeavesOfType(VIEW_TYPE);
-        const leaf = workspace.getLeaf(
-            // @ts-ignore
-            !Platform.isMobile
-        );
-        await leaf.setViewState({type: VIEW_TYPE});
-        workspace.revealLeaf(leaf);
+    updateStatusBar() {
+        this.statusBarItem.setText(`🏃🏻 ${getFilesByTag(this.app, this.settings.tag).length} tracked`);
     }
+
 }
 
 class SampleSettingTab extends PluginSettingTab {
-    plugin: MyPlugin;
+    plugin: MindSteps;
 
-    constructor(app: App, plugin: MyPlugin) {
+    constructor(app: App, plugin: MindSteps) {
         super(app, plugin);
         this.plugin = plugin;
     }
 
     display(): void {
-        const {containerEl} = this;
+        const { containerEl } = this;
 
         containerEl.empty();
 
-        containerEl.createEl('h2', {text: 'Settings for my awesome plugin.'});
+        containerEl.createEl('h2', { text: 'Mind Steps' });
 
         new Setting(containerEl)
-            .setName('Setting #1')
-            .setDesc('It\'s a secret')
+            .setName('Track Tag')
+            .setDesc('Enter your special tag by which you will track your progress')
             .addText(text => text
-                .setPlaceholder('Enter your secret')
-                .setValue(this.plugin.settings.mySetting)
+                .setPlaceholder('#example')
+                .setValue(this.plugin.settings.tag)
                 .onChange(async (value) => {
-                    this.plugin.settings.mySetting = value;
+                    this.plugin.settings.tag = value;
                     await this.plugin.saveSettings();
                 }));
     }
