@@ -86,7 +86,7 @@ export default class MindSteps extends Plugin {
             (leaf) => new TracksStatisticView(leaf, this.app, this.settings)
         );
 
-        this.addRibbonIcon("dice", "Tracks Statistic", (evt: MouseEvent) => {
+        this.addRibbonIcon("blocks", "Tracks Statistic", (evt: MouseEvent) => {
             this.showView();
         });
 
@@ -103,7 +103,7 @@ export default class MindSteps extends Plugin {
         this.updateStatusBar();
 
         // This creates an icon in the left ribbon.
-        this.addRibbonIcon('calendar-with-checkmark', 'mindsteps', (evt: MouseEvent) => {
+        this.addRibbonIcon('calendar-with-checkmark', 'Track', (evt: MouseEvent) => {
             new TrackModal(this.app, this.settings).open()
             this.updateStatusBar();
         });

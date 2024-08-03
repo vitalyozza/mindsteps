@@ -18,6 +18,7 @@
         "@typescript-eslint/eslint-plugin": "6.21.0",
         "@typescript-eslint/parser": "6.21.0",
         "builtin-modules": "3.3.0",
+        "d3": "^7.9.0",
         "eslint-plugin-svelte": "^2.37.0",
         "markdown-it": "^14.1.0",
         "obsidian": "latest",
@@ -31,5 +32,8 @@
         "tslib": "2.4.0",
         "typescript": "5.3.3",
         "vite": "^5.2.10"
+    },
+    "dependencies": {
+        "svelte-heatmap": "^1.0.2"
     }
 }
