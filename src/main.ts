@@ -1,6 +1,7 @@
-import { App, Plugin, PluginSettingTab, Setting, Modal, Notice } from 'obsidian';
+import { App, Plugin, PluginSettingTab, Setting, Modal, Notice, ItemView, WorkspaceLeaf } from 'obsidian';
 import { getFilesByTag } from "./common"
-import TrackerModal from "./ui/Modal.svelte";
+import TrackerModal from "./ui/TrackAddingModal.svelte";
+import TracksStatistic from "./ui/TracksStatistic.svelte";
 
 interface MindStepsSettings {
     tag: string;
@@ -31,19 +32,63 @@ export class TrackModal extends Modal {
 
     onClose() {
         try {
-            this.close()   
+            this.close()
         } catch (RangeError) {
             return true
         }
     }
 }
 
+const VIEW_TYPE = "svelte-view";
+
+class TracksStatisticView extends ItemView {
+    private component: TracksStatistic | null = null;
+    settings: MindStepsSettings;
+
+    constructor(leaf: WorkspaceLeaf, app: App, settings: MindStepsSettings) {
+        super(leaf);
+        this.app = app;
+        this.settings = settings;
+    }
+
+    getViewType(): string {
+        return VIEW_TYPE;
+    }
+
+    getDisplayText(): string {
+        return "Tracks Statistic";
+    }
+
+    getIcon(): string {
+        return "track";
+    }
+
+    async onOpen(): Promise<void> {
+        this.component = new TracksStatistic({
+            target: this.contentEl, props: {
+                app: this.app,
+                settings: this.settings
+            }
+        });
+    }
+}
+
 export default class MindSteps extends Plugin {
+    private view: TracksStatisticView | null = null;
     settings: MindStepsSettings = DEFAULT_SETTINGS;
     statusBarItem: HTMLElement | undefined;
 
     async onload() {
         await this.loadSettings();
+
+        this.registerView(
+            VIEW_TYPE,
+            (leaf) => new TracksStatisticView(leaf, this.app, this.settings)
+        );
+
+        this.addRibbonIcon("dice", "Tracks Statistic", (evt: MouseEvent) => {
+            this.showView();
+        });
 
         this.addCommand({
             id: "display-modal",
@@ -83,6 +128,15 @@ export default class MindSteps extends Plugin {
 
     updateStatusBar() {
         this.statusBarItem.setText(`🏃🏻 ${getFilesByTag(this.app, this.settings.tag).length} tracked`);
+    }
+
+    async showView() {
+        this.app.workspace.detachLeavesOfType(VIEW_TYPE);
+
+        await this.app.workspace.getLeaf(false).setViewState({
+            type: VIEW_TYPE,
+            active: true,
+        });
     }
 
 }

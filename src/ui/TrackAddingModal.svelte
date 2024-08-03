@@ -3,7 +3,7 @@
     import RangeSlider from "svelte-range-slider-pips";
     import Toggle from "svelte-switcher";
     import { onMount } from "svelte";
-    import { getFilesByTag } from "../common"
+    import { getFilesByTag } from "../common";
 
     export let app: any;
     export let modal: any;
@@ -32,7 +32,7 @@
             date: {
                 path: `Base/${new Date().toISOString().split("T")[0]}.md`,
                 value: new Date().toISOString().split("T")[0],
-                url: `[[Base/${new Date().toISOString().split("T")[0]}.md|${new Date().toISOString().split("T")[0]}]]`
+                url: `[[Base/${new Date().toISOString().split("T")[0]}.md|${new Date().toISOString().split("T")[0]}]]`,
             },
         },
         isFilled: false,
@@ -41,17 +41,17 @@
     $: formValidation.isFilled =
         formValidation.fields.document.isFilled &&
         formValidation.fields.note.isFilled;
-        
-    let clearDocumentName = (path:string) => {
-        let item = path.replace(".md", "").split("/").pop()   
-        return item
-    }
+
+    let clearDocumentName = (path: string) => {
+        let item = path.replace(".md", "").split("/").pop();
+        return item;
+    };
 
     formValidation.fields.document.value = documentValue;
 
     $: formValidation.fields.document.path = documentValue;
     $: formValidation.fields.time.value = timeValue;
-    $: formValidation.fields.document.url = `[[${formValidation.fields.document.path}|${clearDocumentName(documentValue)}]]`
+    $: formValidation.fields.document.url = `[[${formValidation.fields.document.path}|${clearDocumentName(documentValue)}]]`;
     $: outputForToday =
         formValidation.fields.note.value === null
             ? ""
@@ -90,32 +90,35 @@
     });
 
     let handleButtonClick = async () => {
-
         try {
-            await writeLineToFile(formValidation.fields.document.path, outputForNote);
-            await writeLineToFile(formValidation.fields.date.path, outputForToday);   
+            await writeLineToFile(
+                formValidation.fields.document.path,
+                outputForNote,
+            );
+            await writeLineToFile(
+                formValidation.fields.date.path,
+                outputForToday,
+            );
         } catch (ENOENT) {
-            new Notice("You need to create Daily note before track data")
+            new Notice("You need to create Daily note before track data");
         }
 
         // Add your post-action logic here (e.g., close modal, display success message)
         try {
-            modal.close();   
-            new Notice("Mind Steps: Added new data!")
+            modal.close();
+            new Notice("Mind Steps: Added new data!");
         } catch (RangeError) {
-            return true
+            return true;
         }
-
     };
 
     let displayMinutes = () => {
         if (formValidation.fields.time.isNeeded) {
-            return `(${formValidation.fields.time.value} mins)`
+            return `(${formValidation.fields.time.value} mins)`;
         } else {
-            return ``
+            return ``;
         }
-    }
-
+    };
 </script>
 
 <div>
@@ -138,15 +141,20 @@
         </select>
     </p>
     <p>
-        <span style="display: flex; gap: 16px;"><Toggle
-            id="svelte-toggle" 
-            name="theme-toggle" 
-            onChange={() => {formValidation.fields.time.isNeeded = !formValidation.fields.time.isNeeded}}
-            defaultChecked={formValidation.fields.time.isNeeded}
-        />Allow Tracking Time</span>
+        <span style="display: flex; gap: 16px;"
+            ><Toggle
+                id="svelte-toggle"
+                name="theme-toggle"
+                onChange={() => {
+                    formValidation.fields.time.isNeeded =
+                        !formValidation.fields.time.isNeeded;
+                }}
+                defaultChecked={formValidation.fields.time.isNeeded}
+            />Allow Tracking Time</span
+        >
     </p>
     {#if formValidation.fields.time.isNeeded}
-        <br/>
+        <br />
         <p>
             <RangeSlider
                 values={[50]}
@@ -154,10 +162,12 @@
                 min={1}
                 max={560}
                 pipstep={60}
-                first='label'
-                last='label'
-                pips=true
-                on:change={(e) => { formValidation.fields.time.value = e.detail.value }}
+                first="label"
+                last="label"
+                pips="true"
+                on:change={(e) => {
+                    formValidation.fields.time.value = e.detail.value;
+                }}
             />
             <span>{formValidation.fields.time.value} mins</span>
         </p>
