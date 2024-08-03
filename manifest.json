@@ -1,10 +1,10 @@
 {
-	"id": "mind-steps",
-	"name": "Mind Steps",
-	"version": "0.0.2",
-	"minAppVersion": "0.0.2",
-	"description": "Simple Tracker for Obsidian",
-	"author": "vitalyozza",
-	"authorUrl": "https://github.com/vitalyozza",
-	"isDesktopOnly": false
+    "id": "mind-steps",
+    "name": "Mind Steps",
+    "version": "0.0.3",
+    "minAppVersion": "0.0.3",
+    "description": "Simple Tracker for Obsidian",
+    "author": "vitalyozza",
+    "authorUrl": "https://github.com/vitalyozza",
+    "isDesktopOnly": false
 }
